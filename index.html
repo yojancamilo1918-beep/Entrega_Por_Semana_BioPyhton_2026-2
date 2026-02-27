@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entregas · BioPython · Yojan Vargas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f0f4fa;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* ========== MENÚ LATERAL IZQUIERDO ========== */
+        .menu-lateral {
+            width: 260px;
+            background: linear-gradient(180deg, #13294b 0%, #1b3a62 100%);
+            color: #eef5ff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 10, 30, 0.3);
+            border-top-right-radius: 24px;
+            border-bottom-right-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+
+        .menu-header {
+            padding: 28px 18px 16px 22px;
+            border-bottom: 1px solid #2f5585;
+        }
+
+        .menu-header h2 {
+            font-weight: 400;
+            font-size: 1.35rem;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+            color: #d0e2ff;
+        }
+
+        .menu-header h2 span {
+            font-weight: 700;
+            color: white;
+            display: block;
+            margin-top: 6px;
+            font-size: 1.6rem;
+            border-left: 4px solid #6ab0fe;
+            padding-left: 14px;
+        }
+
+        .menu-items {
+            flex: 1;
+            padding: 30px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: #d6e6ff;
+            transition: 0.2s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item i { font-size: 1.4rem; width: 28px; font-style: normal; font-weight: 400; }
+        .menu-item:hover { background: #244b78; color: white; }
+        .menu-item.activo {
+            background: #2d6fb0;
+            color: white;
+            box-shadow: 0 8px 14px -6px #0b1e33;
+            font-weight: 600;
+        }
+
+        .menu-footer {
+            padding: 20px 18px 26px 22px;
+            font-size: 0.85rem;
+            color: #98b9e6;
+            border-top: 1px solid #253e60;
+        }
+
+        /* ========== CONTENIDO PRINCIPAL (LADO DERECHO) ========== */
+        .contenido-principal {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 28px 38px;
+            overflow-y: auto;
+            background: #f7faff;
+        }
+
+        /* cabecera superior con subtítulo centrado */
+        .top-titulos {
+            margin-bottom: 30px;
+            border-bottom: 2px dashed #bfd4f0;
+            padding-bottom: 18px;
+        }
+
+        .top-titulos h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #102b47;
+            letter-spacing: -0.5px;
+        }
+
+        .top-titulos .subtitulo {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #1f4975;
+            text-align: center;
+            background: #e3edfe;
+            padding: 12px 18px;
+            border-radius: 50px;
+            margin-top: 12px;
+            box-shadow: inset 0 1px 6px #b7c9e6;
+            border: 1px solid white;
+        }
+
+        /* panel dinámico (cada pestaña) */
+        .panel {
+            background: white;
+            border-radius: 40px;
+            padding: 30px 35px;
+            box-shadow: 0 18px 36px -14px #7d98b9;
+            flex: 1;
+            border: 1px solid #eef4ff;
+        }
+
+        .panel h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #113355;
+            margin-bottom: 28px;
+            border-left: 8px solid #2a73c4;
+            padding-left: 24px;
+        }
+
+        /* cuadrícula de comandos */
+        .comandos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .comando-card {
+            background: #f6faff;
+            border-radius: 28px;
+            padding: 22px 20px;
+            border: 1px solid #cddefa;
+            transition: 0.15s;
+            box-shadow: 0 5px 12px rgba(0,20,50,0.04);
+        }
+
+        .comando-card:hover {
+            border-color: #6d9eec;
+            background: #ffffff;
+            box-shadow: 0 14px 22px -10px #87afe0;
+        }
+
+        .comando-titulo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            color: #0a2a44;
+            margin-bottom: 12px;
+            border-bottom: 2px dotted #b0caf5;
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comando-titulo span {
+            font-size: 0.9rem;
+            background: #1d4e8f;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-family: sans-serif;
+            font-weight: 400;
+        }
+
+        .uso {
+            background: #eef3fc;
+            padding: 14px 14px;
+            border-radius: 16px;
+            margin: 16px 0 12px;
+            border-left: 4px solid #0d4b9e;
+            font-size: 0.95rem;
+        }
+
+        .uso code {
+            font-family: 'Fira Code', monospace;
+            background: #d9e7ff;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            color: #002856;
+        }
+
+        .sugerencia {
+            background: #e0ebf9;
+            border-radius: 18px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: #003074;
+            border: 1px solid white;
+        }
+
+        .sugerencia i { font-style: normal; background: #2770c9; color: white; padding: 2px 8px; border-radius: 30px; margin-right: 6px; font-size: 0.8rem;}
+
+        .footer-info {
+            margin-top: 30px;
+            text-align: right;
+            font-size: 0.9rem;
+            color: #446688;
+        }
+
+        /* Estilos para el visor de PDFs */
+        .pdf-container {
+            background: #f0f4fa;
+            border-radius: 28px;
+            padding: 20px;
+            margin-top: 20px;
+            height: 700px;
+            border: 2px solid #cddefa;
+        }
+        
+        .pdf-visor {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 16px;
+            background: white;
+        }
+        
+        .pdf-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .btn-pdf {
+            background: #e3edfe;
+            border: 2px solid #b0caf5;
+            color: #113355;
+            padding: 15px 30px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 10px rgba(0,30,70,0.1);
+            flex: 1;
+            max-width: 300px;
+            justify-content: center;
+        }
+        
+        .btn-pdf:hover {
+            background: #2770c9;
+            border-color: #2770c9;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(39,112,201,0.3);
+        }
+        
+        .btn-pdf.activo-pdf {
+            background: #1d4e8f;
+            border-color: #1d4e8f;
+            color: white;
+        }
+        
+        .pdf-info {
+            text-align: center;
+            margin: 20px 0 10px;
+            color: #446688;
+            font-size: 1rem;
+            padding: 10px;
+            background: #f0f7ff;
+            border-radius: 30px;
+        }
+
+        /* segundo panel (oculto inicialmente) */
+        .oculto {
+            display: none;
+        }
+
+        /* responsive */
+        @media (max-width: 720px) {
+            body { flex-direction: column; }
+            .menu-lateral { width: 100%; border-radius: 0; }
+            .contenido-principal { padding: 15px; }
+            .pdf-container { height: 500px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- MENÚ LATERAL IZQUIERDO -->
+    <nav class="menu-lateral">
+        <div class="menu-header">
+            <h2>Entregas <br> Curso de Programación <span>BioPython</span></h2>
+        </div>
+
+        <div class="menu-items">
+            <button class="menu-item" id="btnComandos">
+                <i>⌨️</i> Comandos de clase
+            </button>
+            <button class="menu-item" id="btnProximos">
+                <i>🧬</i> Próximos temas
+            </button>
+            <button class="menu-item" id="btnEntregaViernes">
+                <i>📅</i> Entrega Viernes 27Feb2026
+            </button>
+        </div>
+
+        <div class="menu-footer">
+            <span>📓 versión 1.0 · estudio</span>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL (LADO DERECHO) -->
+    <main class="contenido-principal">
+        <div class="top-titulos">
+            <h1>Entregas · Curso de Programación · BioPython</h1>
+            <div class="subtitulo">Yojan C. Vargas-Ramírez</div>
+        </div>
+
+        <!-- PANEL DE COMANDOS -->
+        <div id="panelComandos" class="panel oculto">
+            <h3>⌨️ Comandos de clase</h3>
+            <div class="comandos-grid">
+                <!-- print(.) -->
+                <div class="comando-card">
+                    <div class="comando-titulo">print(.) <span>función</span></div>
+                    <div class="uso"><code>print(objeto)</code> — muestra en consola.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Separa varios valores con comas: <code>print("A", 20)</code>. Usa <code>sep=</code> y <code>end=</code>.</div>
+                </div>
+                <!-- print(f".)  (f-string) -->
+                <div class="comando-card">
+                    <div class="comando-titulo">print(f".) <span>f-string</span></div>
+                    <div class="uso"><code>print(f"texto {variable}")</code> — interpolación.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Ideal para formatear: <code>print(f"El resultado es {num:.2f}")</code>. Desde Python 3.6.</div>
+                </div>
+                <!-- input(.) -->
+                <div class="comando-card">
+                    <div class="comando-titulo">input(.) <span>entrada</span></div>
+                    <div class="uso"><code>variable = input("mensaje: ")</code> — lee texto.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Siempre retorna string. Convertir con <code>int()</code> o <code>float()</code> si se espera número.</div>
+                </div>
+                <!-- float(.) -->
+                <div class="comando-card">
+                    <div class="comando-titulo">float(.) <span>conversión</span></div>
+                    <div class="uso"><code>float(cadena_o_entero)</code> → número decimal.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Útil para operaciones con decimales. Ej: <code>altura = float(input("altura:"))</code>.</div>
+                </div>
+                <!-- int(.) -->
+                <div class="comando-card">
+                    <div class="comando-titulo">int(.) <span>conversión</span></div>
+                    <div class="uso"><code>int(objeto)</code> → entero (trunca si es float).</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> <code>int("42")</code> → 42. Cuidado con decimales: <code>int(3.99)</code> → 3.</div>
+                </div>
+                <!-- array(.) (de array o lista) -->
+                <div class="comando-card">
+                    <div class="comando-titulo">array(.) <span>módulo array/list</span></div>
+                    <div class="uso"><code>from array import array; a = array('i',[1,2,3])</code> o usar listas <code>[]</code>.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Para BioPython, listas son comunes. Ej: <code>secuencias = ["ATGC", "CGTA"]</code>.</div>
+                </div>
+                <!-- numpy. -->
+                <div class="comando-card">
+                    <div class="comando-titulo">numpy. <span>librería</span></div>
+                    <div class="uso"><code>import numpy as np; arr = np.array([1,2,3])</code>.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Operaciones vectoriales rápidas. Para datos biológicos: <code>np.mean(elongaciones)</code>.</div>
+                </div>
+                <!-- math. -->
+                <div class="comando-card">
+                    <div class="comando-titulo">math. <span>módulo math</span></div>
+                    <div class="uso"><code>import math; math.log(100,10)</code>, <code>math.sqrt(81)</code>, constantes.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Funciones matemáticas: <code>math.sin, cos, exp, log10</code>. Útil para BioPython (distancia, estadística).</div>
+                </div>
+                <!-- import -->
+                <div class="comando-card">
+                    <div class="comando-titulo">import <span>sentencia</span></div>
+                    <div class="uso"><code>import modulo</code> o <code>from modulo import funcion</code>.</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Para BioPython: <code>from Bio import SeqIO</code>. Organiza el código y evita colisiones.</div>
+                </div>
+                <!-- for -->
+                <div class="comando-card">
+                    <div class="comando-titulo">for <span>ciclo</span></div>
+                    <div class="uso"><code>for variable in iterable:</code> (dos puntos y sangría).</div>
+                    <div class="sugerencia"><i>🔑 sugerencia</i> Recorrer listas, cadenas, archivos. Ej: <code>for base in "ATCG": print(base)</code>.</div>
+                </div>
+            </div>
+            <div class="footer-info">
+                ⚡ comandos vistos en clase hasta la fecha · Yojan C. Vargas-R.
+            </div>
+        </div>
+
+        <!-- PANEL PRÓXIMOS TEMAS -->
+        <div id="panelProximos" class="panel oculto">
+            <h3>🧬 Próximos temas del curso</h3>
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div style="background:#eef4fe; border-radius: 26px; padding: 30px;">
+                    <p style="font-size: 1.5rem; font-weight: 300; margin-bottom: 18px;">⚙️ Módulos BioPython:</p>
+                    <ul style="font-size: 1.2rem; list-style-type: '🔬 '; padding-left: 36px;">
+                        <li><code>Seq</code> y <code>SeqRecord</code></li>
+                        <li><code>Bio.Align</code> para alineamientos</li>
+                        <li><code>Entrez</code> (bases de datos NCBI)</li>
+                        <li><code>Phylo</code> para árboles filogenéticos</li>
+                    </ul>
+                    <p style="margin-top: 26px; background: white; border-radius: 28px; padding: 16px;">🐍 Esta sección se llenará con contenido de las siguientes clases.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUEVO PANEL: ENTREGA VIERNES 27 FEBRERO 2026 -->
+        <div id="panelEntregaViernes" class="panel oculto">
+            <h3>📅 Entrega Viernes 27 Febrero 2026</h3>
+            
+            <!-- Selector de PDFs -->
+            <div class="pdf-selector">
+                <button id="btnPDF1" class="btn-pdf activo-pdf">
+                    <span>📄</span> Método Po-Shen Loh
+                </button>
+                <button id="btnPDF2" class="btn-pdf">
+                    <span>📄</span> Condicionales Python
+                </button>
+            </div>
+            
+            <!-- Visor de PDFs -->
+            <div class="pdf-container">
+                <iframe id="pdfViewer" class="pdf-visor" src="Artículo_PoShenLoh.pdf"></iframe>
+            </div>
+            
+            <!-- Información del PDF actual -->
+            <div id="pdfInfo" class="pdf-info">
+                Mostrando: <strong>Artículo Po-Shen Loh</strong>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function() {
+            // Elementos del menú principal
+            const btnComandos = document.getElementById('btnComandos');
+            const btnProximos = document.getElementById('btnProximos');
+            const btnEntregaViernes = document.getElementById('btnEntregaViernes');
+            const panelComandos = document.getElementById('panelComandos');
+            const panelProximos = document.getElementById('panelProximos');
+            const panelEntregaViernes = document.getElementById('panelEntregaViernes');
+            
+            // Elementos del visor de PDFs
+            const btnPDF1 = document.getElementById('btnPDF1');
+            const btnPDF2 = document.getElementById('btnPDF2');
+            const pdfViewer = document.getElementById('pdfViewer');
+            const pdfInfo = document.getElementById('pdfInfo');
+            
+            const menuItems = [btnComandos, btnProximos, btnEntregaViernes];
+            const panels = [panelComandos, panelProximos, panelEntregaViernes];
+
+            // Función para cambiar pestaña principal
+            function activarPanel(panelActivo, botonActivo) {
+                panels.forEach(p => p.classList.add('oculto'));
+                menuItems.forEach(b => b.classList.remove('activo'));
+                
+                if (panelActivo) panelActivo.classList.remove('oculto');
+                if (botonActivo) botonActivo.classList.add('activo');
+            }
+
+            // Función para cambiar PDF
+            function cambiarPDF(src, titulo, botonActivo) {
+                pdfViewer.src = src;
+                pdfInfo.innerHTML = `Mostrando: <strong>${titulo}</strong>`;
+                
+                // Actualizar botones activos
+                [btnPDF1, btnPDF2].forEach(b => b.classList.remove('activo-pdf'));
+                botonActivo.classList.add('activo-pdf');
+            }
+
+            // Eventos menú principal
+            btnComandos.addEventListener('click', function() {
+                activarPanel(panelComandos, btnComandos);
+            });
+
+            btnProximos.addEventListener('click', function() {
+                activarPanel(panelProximos, btnProximos);
+            });
+            
+            btnEntregaViernes.addEventListener('click', function() {
+                activarPanel(panelEntregaViernes, btnEntregaViernes);
+            });
+
+            // Eventos selector de PDFs
+            btnPDF1.addEventListener('click', function() {
+                cambiarPDF('Artículo_PoShenLoh.pdf', 'Artículo Po-Shen Loh', btnPDF1);
+            });
+            
+            btnPDF2.addEventListener('click', function() {
+                cambiarPDF('Art_Condicionales_Python.pdf', 'Condicionales en Python', btnPDF2);
+            });
+
+            // Estado inicial: panel de comandos activo
+            activarPanel(panelComandos, btnComandos);
+            
+            // Configurar PDF inicial (por si acaso)
+            cambiarPDF('Artículo_PoShenLoh.pdf', 'Artículo Po-Shen Loh', btnPDF1);
+        })();
+    </script>
+</body>
+</html>
